@@ -11,8 +11,11 @@ import Glossary from '@/components/Glossary';
 import { generatePopulation, performSampling, calculateMetrics, generateCSV } from '@/lib/math';
 import { DataPoint, SamplingMethod } from '@/lib/types';
 import { Activity } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function Home() {
+  const { language, t } = useLanguage();
+  
   // State
   const [population, setPopulation] = useState<DataPoint[]>([]);
   const [method, setMethod] = useState<SamplingMethod>('Simple');
@@ -83,7 +86,7 @@ export default function Home() {
         {/* Visualization Stage */}
         <section className="space-y-4">
           <div className="flex items-center gap-2 px-1">
-            <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Visualization Stage</h2>
+            <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{language === 'am' ? 'የእይታ መድረክ' : 'Visualization Stage'}</h2>
             <div className="h-[1px] flex-1 bg-zinc-900" />
           </div>
           <DataVisualizer population={population} sample={sample} />

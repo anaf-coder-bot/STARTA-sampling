@@ -1,8 +1,7 @@
-'use client';
-
 import React, { useMemo } from 'react';
 import { DataPoint } from '@/lib/types';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface DataVisualizerProps {
   population: DataPoint[];
@@ -10,6 +9,8 @@ interface DataVisualizerProps {
 }
 
 export default function DataVisualizer({ population, sample }: DataVisualizerProps) {
+  const { t } = useLanguage();
+
   const histogramData = useMemo(() => {
     const bins = 20;
     const min = 20000;
@@ -45,7 +46,7 @@ export default function DataVisualizer({ population, sample }: DataVisualizerPro
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Population Grid */}
         <div className="lg:col-span-2 bg-zinc-950 border border-zinc-800 p-6 rounded-xl">
-          <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">Entity Mapping Index</h3>
+          <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">{t('visualizer.entityMapping')}</h3>
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="grid grid-cols-[repeat(40,1fr)] gap-1 w-full max-w-3xl aspect-video">
               {population.map((p) => {
@@ -65,18 +66,18 @@ export default function DataVisualizer({ population, sample }: DataVisualizerPro
           <div className="mt-4 flex gap-6 text-[10px] font-mono justify-center text-zinc-500">
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-sm bg-indigo-500" />
-              <span>Sampled Matrix</span>
+              <span>{t('visualizer.sampledMatrix')}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-sm bg-zinc-800" />
-              <span>Reference Population</span>
+              <span>{t('visualizer.referencePop')}</span>
             </div>
           </div>
         </div>
 
         {/* Distribution Plot */}
         <div className="lg:col-span-1 bg-zinc-950 border border-zinc-800 p-6 rounded-xl flex flex-col">
-          <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">Dynamic Density</h3>
+          <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">{t('visualizer.dynamicDensity')}</h3>
           <div className="flex-1 min-h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={histogramData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -115,7 +116,7 @@ export default function DataVisualizer({ population, sample }: DataVisualizerPro
                   formatter={(value: number, name: string, props: any) => {
                     const isSample = name === 'sample';
                     const rawCount = isSample ? props.payload.sampleRaw : props.payload.popRaw;
-                    return [`${value.toFixed(1)}% (${rawCount} units)`, isSample ? 'Active Sample' : 'Population Base'];
+                    return [`${value.toFixed(1)}% (${rawCount} ${t('visualizer.units')})`, isSample ? t('visualizer.activeSample') : t('visualizer.populationBase')];
                   }}
                 />
                 <Area 
@@ -139,7 +140,7 @@ export default function DataVisualizer({ population, sample }: DataVisualizerPro
             </ResponsiveContainer>
           </div>
           <p className="mt-4 text-[9px] text-zinc-600 font-mono text-center leading-tight">
-            Comparison of Population Probability Density vs. Local Sample Extraction.
+            {t('visualizer.densityNote')}
           </p>
         </div>
       </div>

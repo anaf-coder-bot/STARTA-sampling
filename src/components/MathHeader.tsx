@@ -1,9 +1,8 @@
-'use client';
-
 import React from 'react';
 import Latex from 'react-latex-next';
 import { SamplingMethod } from '@/lib/types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface MathHeaderProps {
   method: SamplingMethod;
@@ -16,14 +15,9 @@ const formulas: Record<SamplingMethod, string> = {
   Reservoir: '$$P(\\text{included}) = \\frac{k}{n}$$',
 };
 
-const descriptions: Record<SamplingMethod, string> = {
-  Simple: 'Every member of the population has an equal chance of being selected.',
-  Stratified: 'The population is divided into subgroups (strata) and samples are taken from each.',
-  Systematic: 'Selecting every k-th individual from a randomly ordered list.',
-  Reservoir: 'A randomized algorithm for choosing a sample of k items from a list of n items, where n is a very large or unknown number.',
-};
-
 export default function MathHeader({ method }: MathHeaderProps) {
+  const { t } = useLanguage();
+
   return (
     <div className="bg-zinc-950 border border-zinc-800 p-6 rounded-xl overflow-hidden relative">
       <div className="absolute top-0 right-0 p-4 opacity-5 font-mono text-4xl select-none text-zinc-500">
@@ -39,12 +33,12 @@ export default function MathHeader({ method }: MathHeaderProps) {
           transition={{ duration: 0.3 }}
           className="relative z-10"
         >
-          <h2 className="text-indigo-500 text-[10px] font-bold font-mono tracking-widest uppercase mb-4">Core Model // {method}</h2>
+          <h2 className="text-indigo-500 text-[10px] font-bold font-mono tracking-widest uppercase mb-4">Core Model // {t(`methods.${method}`)}</h2>
           <div className="text-4xl mb-6 font-serif italic text-zinc-100 flex items-center justify-center min-h-[100px] bg-zinc-900/20 rounded-lg border border-zinc-900/50">
             <Latex>{formulas[method]}</Latex>
           </div>
           <p className="text-zinc-500 text-xs max-w-2xl mx-auto text-center leading-relaxed">
-            {descriptions[method]}
+            {t(`descriptions.${method}`)}
           </p>
         </motion.div>
       </AnimatePresence>

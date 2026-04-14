@@ -1,9 +1,8 @@
-'use client';
-
 import React from 'react';
 import { SamplingMethod } from '@/lib/types';
 import { Settings2, Cpu, Filter, Layers, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface SamplingControlsProps {
   method: SamplingMethod;
@@ -22,11 +21,13 @@ export default function SamplingControls({
   strata,
   setStrata
 }: SamplingControlsProps) {
+  const { t } = useLanguage();
+
   const methods: { id: SamplingMethod; icon: React.ElementType; label: string }[] = [
-    { id: 'Simple', icon: Cpu, label: 'Random' },
-    { id: 'Stratified', icon: Layers, label: 'Stratified' },
-    { id: 'Systematic', icon: Filter, label: 'Systematic' },
-    { id: 'Reservoir', icon: Settings2, label: 'Reservoir' },
+    { id: 'Simple', icon: Cpu, label: t('methods.Simple') },
+    { id: 'Stratified', icon: Layers, label: t('methods.Stratified') },
+    { id: 'Systematic', icon: Filter, label: t('methods.Systematic') },
+    { id: 'Reservoir', icon: Settings2, label: t('methods.Reservoir') },
   ];
 
   return (
@@ -34,14 +35,14 @@ export default function SamplingControls({
       <div>
         <div className="flex items-center justify-between mb-4">
           <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
-            <Settings2 size={12} /> Parameters
+            <Settings2 size={12} /> {t('parameters')}
           </label>
         </div>
         
         <div className="space-y-6">
           <div className="space-y-3">
             <div className="flex justify-between text-[10px] font-mono text-zinc-400">
-              <span>Sample Size ($n$)</span>
+              <span>{t('sampleSize')}</span>
               <span className="text-indigo-400">{sampleSize}</span>
             </div>
             <input
@@ -58,9 +59,9 @@ export default function SamplingControls({
           <div className="p-3 bg-indigo-500/5 border border-indigo-500/10 rounded-lg">
              <div className="flex items-center gap-2 text-indigo-400 mb-1">
                <Info size={10} />
-               <span className="text-[9px] font-bold uppercase tracking-tight">Active Confidence</span>
+               <span className="text-[9px] font-bold uppercase tracking-tight">{t('activeConfidence')}</span>
              </div>
-             <div className="text-[10px] text-zinc-500 font-medium">95.0% Confidence Interval applied.</div>
+             <div className="text-[10px] text-zinc-500 font-medium">{t('confidenceNote')}</div>
           </div>
         </div>
       </div>
@@ -69,7 +70,7 @@ export default function SamplingControls({
 
       <div>
         <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2 mb-4">
-          <Cpu size={12} /> Algorithm
+          <Cpu size={12} /> {t('algorithm')}
         </label>
         <div className="grid grid-cols-1 gap-1.5">
           {methods.map((m) => {
@@ -99,7 +100,7 @@ export default function SamplingControls({
           animate={{ opacity: 1, height: 'auto' }}
           className="space-y-3 pt-2"
         >
-          <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">Stratification Key</label>
+          <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">{t('stratificationKey')}</label>
           <div className="flex gap-1.5 p-1 bg-zinc-900/50 rounded-md border border-zinc-900/50">
             {(['userType', 'ageGroup'] as const).map((s) => (
               <button

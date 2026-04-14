@@ -1,7 +1,6 @@
-'use client';
-
 import React from 'react';
 import { Cpu, Hash } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface TechSpecsProps {
   sampleSize: number;
@@ -14,13 +13,15 @@ interface TechSpecsProps {
 }
 
 export default function TechSpecs({ sampleSize, popSize, metrics }: TechSpecsProps) {
+  const { t } = useLanguage();
+
   const specs = [
-    { label: 'Sample Count ($n$)', value: sampleSize.toString() },
-    { label: 'Population ($N$)', value: popSize.toString() },
-    { label: 'Sampling Ratio', value: (sampleSize / popSize).toFixed(3) },
-    { label: 'MSE', value: metrics.mse.toFixed(2) },
-    { label: 'Standard Error', value: metrics.standardError.toFixed(6) },
-    { label: 'Entropy (D_KL)', value: metrics.klDivergence.toFixed(8) },
+    { label: t('sampleCount'), value: sampleSize.toString() },
+    { label: t('popCount'), value: popSize.toString() },
+    { label: t('samplingRatio'), value: (sampleSize / popSize).toFixed(3) },
+    { label: t('mse'), value: metrics.mse.toFixed(2) },
+    { label: t('stdError'), value: metrics.standardError.toFixed(6) },
+    { label: t('entropy'), value: metrics.klDivergence.toFixed(8) },
   ];
 
   return (
@@ -28,10 +29,10 @@ export default function TechSpecs({ sampleSize, popSize, metrics }: TechSpecsPro
       <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Cpu size={16} className="text-zinc-500" />
-          <h3 className="text-sm font-semibold tracking-tight text-zinc-300">Technical Specs</h3>
+          <h3 className="text-sm font-semibold tracking-tight text-zinc-300">{t('techSpecs')}</h3>
         </div>
         <div className="px-1.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[9px] font-bold text-indigo-400 uppercase">
-          Precision: 64bit
+          {t('precision')}: 64bit
         </div>
       </div>
       
@@ -50,7 +51,7 @@ export default function TechSpecs({ sampleSize, popSize, metrics }: TechSpecsPro
       <div className="mt-auto p-4 border-t border-zinc-800 bg-zinc-900/10">
         <div className="flex flex-col gap-2">
           <div className="flex justify-between text-[10px] uppercase font-bold text-zinc-600">
-            <span>Utilization</span>
+            <span>{t('utilization')}</span>
             <span>{(sampleSize / popSize * 100).toFixed(1)}%</span>
           </div>
           <div className="w-full h-1 bg-zinc-900 rounded-full overflow-hidden">

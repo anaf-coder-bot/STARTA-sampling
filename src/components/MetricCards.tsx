@@ -3,6 +3,7 @@
 import React from 'react';
 import { Target, Info, Activity, Percent } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface MetricCardsProps {
   metrics: {
@@ -14,34 +15,36 @@ interface MetricCardsProps {
 }
 
 export default function MetricCards({ metrics }: MetricCardsProps) {
+  const { t } = useLanguage();
+  
   const cards = [
     {
-      label: 'Representativeness',
+      label: t('representativeness'),
       value: `${Math.round(metrics.representativeness)}%`,
       icon: Target,
       color: 'text-indigo-500',
-      description: 'Accuracy vs. Population'
+      description: t('accuracyVsPop')
     },
     {
-      label: 'Margin of Error (95%)',
+      label: t('marginOfError'),
       value: `±${(metrics.marginOfError / 1000).toFixed(2)}k`,
       icon: Info,
       color: 'text-zinc-400',
-      description: 'Confidence threshold'
+      description: t('confidenceThreshold')
     },
     {
-      label: 'Relative Bias',
+      label: t('relativeBias'),
       value: `${metrics.relativeBias.toFixed(2)}%`,
       icon: Percent,
       color: 'text-zinc-400',
-      description: 'Systemic deviation'
+      description: t('systemicDeviation')
     },
     {
-      label: 'KL Divergence',
+      label: t('klDivergence'),
       value: metrics.klDivergence.toFixed(4),
       icon: Activity,
       color: 'text-zinc-400',
-      description: 'Information entropy'
+      description: t('infoEntropy')
     }
   ];
 
