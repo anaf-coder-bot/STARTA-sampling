@@ -57,3 +57,47 @@ body {
 .text-zinc-muted {
   color: #71717a;
 }
+
+/* Custom Precision Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #09090b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6366f1;
+}
+
+/* Interactive Vibe */
+::selection {
+  background: rgba(99, 102, 241, 0.2);
+  color: #fafafa;
+}
+
+/* Precision Cursor for Technical Areas */
+.precision-cursor {
+  cursor: crosshair;
+}
+
+button, a {
+  cursor: pointer;
+}
+
+/* Scroll Smoothing */
+html {
+  scroll-behavior: smooth;
+}
+
+main {
+  scrollbar-gutter: stable;
+}

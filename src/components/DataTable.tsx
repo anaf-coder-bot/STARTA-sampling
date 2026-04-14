@@ -33,7 +33,7 @@ export default function DataTable({ sample }: DataTableProps) {
         </div>
       </div>
       
-      <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+      <div className="overflow-x-auto max-h-[500px] overflow-y-auto precision-cursor">
         <table className="w-full text-left border-collapse min-w-[800px]">
           <thead className="sticky top-0 bg-zinc-950/95 backdrop-blur-sm z-10 border-b border-zinc-900">
             <tr>

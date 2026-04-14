@@ -53,7 +53,7 @@ export default function DataVisualizer({ population, sample }: DataVisualizerPro
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-zinc-950 border border-zinc-800 p-6 rounded-xl overflow-hidden">
           <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">{t('visualizer.entityMapping')}</h3>
-          <div className="flex items-start justify-center min-h-[400px] overflow-y-auto max-h-[600px] scrollbar-hide p-1">
+          <div className="flex items-start justify-center min-h-[400px] overflow-y-auto max-h-[600px] p-1 precision-cursor">
             <div 
               className="grid w-full max-w-4xl"
               style={{ 
@@ -90,7 +90,7 @@ export default function DataVisualizer({ population, sample }: DataVisualizerPro
           </div>
         </div>
 
-        <div className="lg:col-span-1 bg-zinc-950 border border-zinc-800 p-6 rounded-xl flex flex-col">
+        <div className="lg:col-span-1 bg-zinc-950 border border-zinc-800 p-6 rounded-xl flex flex-col precision-cursor">
           <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">{t('visualizer.dynamicDensity')}</h3>
           <div className="flex-1 min-h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
