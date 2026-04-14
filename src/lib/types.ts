@@ -8,6 +8,7 @@ export interface DataPoint {
   userType: UserType;
   x: number;
   y: number;
+  metadata?: Record<string, string | number>;
 };
 
 export type SamplingMethod = 'Simple' | 'Stratified' | 'Systematic' | 'Reservoir';
@@ -21,5 +22,7 @@ export interface SamplingResults {
     marginOfError: number;
     relativeBias: number;
     representativeness: number;
+    sampleMean: number;
+    populationMean: number;
   };
 }

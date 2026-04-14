@@ -16,7 +16,6 @@ interface BiasMeterProps {
 export default function BiasMeter({ metrics }: BiasMeterProps) {
   const score = Math.round(metrics.representativeness);
   
-  // Color based on score
   const getScoreColor = (s: number) => {
     if (s > 90) return 'text-accent-cyan';
     if (s > 70) return 'text-accent-indigo';

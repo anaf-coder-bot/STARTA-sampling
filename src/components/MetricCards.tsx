@@ -11,6 +11,8 @@ interface MetricCardsProps {
     marginOfError: number;
     relativeBias: number;
     representativeness: number;
+    sampleMean: number;
+    populationMean: number;
   };
 }
 
@@ -18,6 +20,13 @@ export default function MetricCards({ metrics }: MetricCardsProps) {
   const { t } = useLanguage();
   
   const cards = [
+    {
+      label: t('averageIncome'),
+      value: `$${(metrics.sampleMean / 1000).toFixed(1)}k`,
+      icon: Activity,
+      color: 'text-emerald-500',
+      description: `${t('populationTruth')}: $${(metrics.populationMean / 1000).toFixed(1)}k`
+    },
     {
       label: t('representativeness'),
       value: `${Math.round(metrics.representativeness)}%`,
@@ -49,7 +58,7 @@ export default function MetricCards({ metrics }: MetricCardsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
       {cards.map((card, i) => (
         <motion.div
           key={card.label}

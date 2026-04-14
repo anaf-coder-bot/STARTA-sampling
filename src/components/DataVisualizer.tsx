@@ -41,22 +41,37 @@ export default function DataVisualizer({ population, sample }: DataVisualizerPro
 
   const sampledIds = useMemo(() => new Set(sample.map(s => s.id)), [sample]);
 
+  const gridConfig = useMemo(() => {
+    const n = population.length;
+    const cols = Math.max(10, Math.ceil(Math.sqrt(n * 1.77)));
+    const gap = n > 2000 ? 1 : n > 500 ? 2 : 4;
+    return { cols, gap };
+  }, [population.length]);
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Population Grid */}
-        <div className="lg:col-span-2 bg-zinc-950 border border-zinc-800 p-6 rounded-xl">
+        <div className="lg:col-span-2 bg-zinc-950 border border-zinc-800 p-6 rounded-xl overflow-hidden">
           <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">{t('visualizer.entityMapping')}</h3>
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="grid grid-cols-[repeat(40,1fr)] gap-1 w-full max-w-3xl aspect-video">
+          <div className="flex items-start justify-center min-h-[400px] overflow-y-auto max-h-[600px] scrollbar-hide p-1">
+            <div 
+              className="grid w-full max-w-4xl"
+              style={{ 
+                gridTemplateColumns: `repeat(${gridConfig.cols}, 1fr)`,
+                gap: `${gridConfig.gap}px`
+              }}
+            >
               {population.map((p) => {
                 const isSampled = sampledIds.has(p.id);
                 return (
                   <div
                     key={p.id}
                     className={`
-                      w-full aspect-square rounded-sm transition-all duration-300
-                      ${isSampled ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.4)] scale-110 z-10' : 'bg-zinc-900'}
+                      w-full aspect-square rounded-sm transition-all duration-300 cursor-help
+                      ${isSampled 
+                        ? 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.4)] scale-110 z-10 ring-1 ring-indigo-400/10' 
+                        : 'bg-zinc-900 hover:bg-zinc-800'
+                      }
                     `}
                   />
                 );
@@ -75,7 +90,6 @@ export default function DataVisualizer({ population, sample }: DataVisualizerPro
           </div>
         </div>
 
-        {/* Distribution Plot */}
         <div className="lg:col-span-1 bg-zinc-950 border border-zinc-800 p-6 rounded-xl flex flex-col">
           <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">{t('visualizer.dynamicDensity')}</h3>
           <div className="flex-1 min-h-[300px]">
@@ -113,7 +127,7 @@ export default function DataVisualizer({ population, sample }: DataVisualizerPro
                     fontFamily: 'monospace'
                   }}
                   itemStyle={{color: '#fafafa'}}
-                  formatter={(value: number, name: string, props: any) => {
+                  formatter={(value: number, name: string, props: { payload: { sampleRaw: number; popRaw: number } }) => {
                     const isSample = name === 'sample';
                     const rawCount = isSample ? props.payload.sampleRaw : props.payload.popRaw;
                     return [`${value.toFixed(1)}% (${rawCount} ${t('visualizer.units')})`, isSample ? t('visualizer.activeSample') : t('visualizer.populationBase')];

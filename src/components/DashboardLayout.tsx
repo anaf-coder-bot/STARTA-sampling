@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, LayoutDashboard, ChevronLeft, Download, Globe } from 'lucide-react';
+import { Menu, LayoutDashboard, ChevronLeft, Download } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
 interface DashboardLayoutProps {
@@ -59,7 +59,6 @@ export default function DashboardLayout({ children, sidebar, projectTitle, onExp
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
         <aside 
           className={`
             border-r border-zinc-800 bg-zinc-950 transition-all duration-300 ease-in-out
@@ -93,7 +92,6 @@ export default function DashboardLayout({ children, sidebar, projectTitle, onExp
           </div>
         </aside>
 
-        {/* Main Content */}
         <main className="flex-1 overflow-y-auto bg-zinc-950 relative">
           <div className="p-6 max-w-[1400px] mx-auto">
             {children}

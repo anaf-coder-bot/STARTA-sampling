@@ -1,6 +1,6 @@
 import React from 'react';
 import { SamplingMethod } from '@/lib/types';
-import { Settings2, Cpu, Filter, Layers, Info } from 'lucide-react';
+import { Settings2, Cpu, Filter, Layers, Info, Upload, RotateCcw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -11,6 +11,10 @@ interface SamplingControlsProps {
   setSampleSize: (n: number) => void;
   strata: 'ageGroup' | 'userType';
   setStrata: (s: 'ageGroup' | 'userType') => void;
+  onImport?: (data: string) => void;
+  onReset?: () => void;
+  isCustom?: boolean;
+  maxPoints?: number;
 }
 
 export default function SamplingControls({
@@ -19,9 +23,27 @@ export default function SamplingControls({
   sampleSize,
   setSampleSize,
   strata,
-  setStrata
+  setStrata,
+  onImport,
+  onReset,
+  isCustom,
+  maxPoints
 }: SamplingControlsProps) {
   const { t } = useLanguage();
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && onImport) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        onImport(event.target?.result as string);
+      };
+      reader.readAsText(file);
+    }
+    // Reset input
+    if (e.target) e.target.value = '';
+  };
 
   const methods: { id: SamplingMethod; icon: React.ElementType; label: string }[] = [
     { id: 'Simple', icon: Cpu, label: t('methods.Simple') },
@@ -32,6 +54,45 @@ export default function SamplingControls({
 
   return (
     <div className="flex flex-col gap-8">
+      <div>
+        <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2 mb-4">
+          <Upload size={12} /> {t('importData')}
+        </label>
+        <div className="space-y-2">
+          <input 
+            type="file" 
+            accept=".csv" 
+            className="hidden" 
+            ref={fileInputRef} 
+            onChange={handleFileChange}
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full flex items-center justify-between p-3 bg-zinc-900/50 border border-zinc-800 rounded-lg hover:bg-zinc-900 transition-colors text-xs text-zinc-300"
+          >
+            <span className="flex items-center gap-2">
+              <Upload size={14} className="text-indigo-500" />
+              {t('uploadCsv')}
+            </span>
+            {isCustom && (
+              <span className="text-[9px] bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded font-bold uppercase">Active</span>
+            )}
+          </button>
+          
+          {isCustom && (
+            <button
+              onClick={onReset}
+              className="w-full flex items-center gap-2 p-3 bg-red-500/5 border border-red-500/10 rounded-lg hover:bg-red-500/10 transition-colors text-xs text-red-400"
+            >
+              <RotateCcw size={14} />
+              {t('dataReset')}
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="h-[1px] bg-zinc-900" />
+
       <div>
         <div className="flex items-center justify-between mb-4">
           <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
@@ -48,7 +109,7 @@ export default function SamplingControls({
             <input
               type="range"
               min="10"
-              max="500"
+              max={maxPoints || 1000}
               step="10"
               value={sampleSize}
               onChange={(e) => setSampleSize(parseInt(e.target.value))}

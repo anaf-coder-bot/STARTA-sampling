@@ -110,7 +110,8 @@ export function performSampling(
 
 export function calculateMetrics(population: DataPoint[], sample: DataPoint[]) {
   if (sample.length === 0) return { 
-    klDivergence: 0, mse: 0, standardError: 0, marginOfError: 0, relativeBias: 0, representativeness: 0 
+    klDivergence: 0, mse: 0, standardError: 0, marginOfError: 0, relativeBias: 0, representativeness: 0,
+    sampleMean: 0, populationMean: 0
   };
 
   const popIncomes = population.map(p => p.income);
@@ -121,14 +122,17 @@ export function calculateMetrics(population: DataPoint[], sample: DataPoint[]) {
 
   const mse = Math.pow(popMean - sampleMean, 2);
 
-  // Standard Error calculation
-  const variance = sampleIncomes.reduce((a, b) => a + Math.pow(b - sampleMean, 2), 0) / (sampleIncomes.length - 1 || 1);
-  const standardError = Math.sqrt(variance / sampleIncomes.length);
+  const n = sampleIncomes.length;
+  const N = popIncomes.length;
   
-  // Margin of Error at 95% confidence (Z = 1.96)
+  const isCensus = n === N;
+
+  const variance = sampleIncomes.reduce((a, b) => a + Math.pow(b - sampleMean, 2), 0) / (n - 1 || 1);
+  const fpc = N > 1 ? Math.sqrt((N - n) / (N - 1)) : 1;
+  const standardError = isCensus ? 0 : Math.sqrt(variance / n) * fpc;
+  
   const marginOfError = 1.96 * standardError;
 
-  // Relative Bias (%)
   const relativeBias = ((sampleMean - popMean) / popMean) * 100;
 
   const bins = 10;
@@ -161,7 +165,9 @@ export function calculateMetrics(population: DataPoint[], sample: DataPoint[]) {
     standardError,
     marginOfError,
     relativeBias,
-    representativeness
+    representativeness,
+    sampleMean,
+    populationMean: popMean
   };
 }
 
@@ -181,3 +187,71 @@ export function generateCSV(sample: DataPoint[]): string {
     ...rows.map(row => row.join(','))
   ].join('\n');
 }
+
+export const parseCsv = (text: string): DataPoint[] => {
+  const lines = text.trim().split(/\r?\n/);
+  if (lines.length < 2) return [];
+
+  const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+  
+  const idx = {
+    id: headers.findIndex(h => ['id', 'uuid', 'mems'].includes(h)),
+    income: headers.findIndex(h => ['income', 'salary', 'earnings', 'pay'].includes(h)),
+    age: headers.findIndex(h => ['age', 'years'].includes(h)),
+    ageGroup: headers.findIndex(h => ['agegroup', 'group', 'segment'].includes(h)),
+    userType: headers.findIndex(h => ['usertype', 'type', 'tier', 'cluster'].includes(h)),
+    x: headers.findIndex(h => h === 'x'),
+    y: headers.findIndex(h => h === 'y'),
+  };
+
+  const dataPoints: DataPoint[] = [];
+
+  const dataLines = lines.slice(1, 5001);
+
+  dataLines.forEach((line, i) => {
+    const cols = line.split(',').map(c => c.trim());
+    if (cols.length < 1) return;
+
+    const incomeVal = idx.income !== -1 ? parseFloat(cols[idx.income]) : 50000;
+    const ageVal = idx.age !== -1 ? parseInt(cols[idx.age]) : 30;
+    
+    let ageGroup: AgeGroup = 'Adult';
+    if (idx.ageGroup !== -1 && cols[idx.ageGroup]) {
+      const val = cols[idx.ageGroup].toLowerCase();
+      if (val.includes('young')) ageGroup = 'Young';
+      else if (val.includes('senior') || val.includes('old')) ageGroup = 'Senior';
+    } else if (idx.age !== -1) {
+      if (ageVal < 30) ageGroup = 'Young';
+      else if (ageVal > 60) ageGroup = 'Senior';
+    }
+
+    let userType: UserType = 'Free';
+    if (idx.userType !== -1 && cols[idx.userType]) {
+      const val = cols[idx.userType].toLowerCase();
+      if (val.includes('pro')) userType = 'Pro';
+      else if (val.includes('enterprise') || val.includes('business')) userType = 'Enterprise';
+    }
+
+    const metadata: Record<string, string | number> = {};
+    const coreIndices = Object.values(idx);
+    headers.forEach((h, hIdx) => {
+      if (!coreIndices.includes(hIdx) && cols[hIdx] !== undefined) {
+        const val = cols[hIdx];
+        const num = parseFloat(val);
+        metadata[h] = isNaN(num) ? val : num;
+      }
+    });
+
+    dataPoints.push({
+      id: idx.id !== -1 ? cols[idx.id] : `EXT-${i}`,
+      income: isNaN(incomeVal) ? 50000 : incomeVal,
+      ageGroup,
+      userType,
+      x: idx.x !== -1 ? parseFloat(cols[idx.x]) : Math.random() * 100,
+      y: idx.y !== -1 ? parseFloat(cols[idx.y]) : Math.random() * 100,
+      metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
+    });
+  });
+
+  return dataPoints;
+};

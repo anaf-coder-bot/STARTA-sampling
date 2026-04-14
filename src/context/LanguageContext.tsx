@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { Language, translations } from '@/lib/translations';
 
 interface LanguageContextType {
@@ -14,15 +14,15 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>('en');
 
-  const t = (key: string) => {
+  const t = (key: string): any => {
     const keys = key.split('.');
     let value: any = translations[language];
     
     for (const k of keys) {
-      if (value && value[k]) {
-        value = value[k];
+      if (value && typeof value === 'object' && k in value) {
+        value = (value as Record<string, any>)[k];
       } else {
-        return key; // Fallback to key
+        return key;
       }
     }
     return value;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { DataPoint } from '@/lib/types';
 import { FileSpreadsheet, ArrowUpRight } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
@@ -9,6 +9,16 @@ interface DataTableProps {
 
 export default function DataTable({ sample }: DataTableProps) {
   const { t } = useLanguage();
+
+  const extraColumns = useMemo(() => {
+    const keys = new Set<string>();
+    sample.slice(0, 10).forEach(p => {
+      if (p.metadata) {
+        Object.keys(p.metadata).forEach(k => keys.add(k));
+      }
+    });
+    return Array.from(keys);
+  }, [sample]);
 
   return (
     <div className="bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden flex flex-col">
@@ -32,6 +42,13 @@ export default function DataTable({ sample }: DataTableProps) {
               <th className="px-6 py-3 text-[10px] font-bold text-zinc-600 uppercase tracking-tight">{t('incomeDelta')}</th>
               <th className="px-6 py-3 text-[10px] font-bold text-zinc-600 uppercase tracking-tight">{t('segment')}</th>
               <th className="px-6 py-3 text-[10px] font-bold text-zinc-600 uppercase tracking-tight">{t('cluster')}</th>
+              
+              {extraColumns.map(col => (
+                <th key={col} className="px-6 py-3 text-[10px] font-bold text-indigo-400/80 uppercase tracking-tight">
+                  {col}
+                </th>
+              ))}
+
               <th className="px-6 py-3 text-[10px] font-bold text-zinc-600 uppercase tracking-tight text-right">{t('mapping')}</th>
             </tr>
           </thead>
@@ -52,6 +69,13 @@ export default function DataTable({ sample }: DataTableProps) {
                     </span>
                   </td>
                   <td className="px-6 py-3 text-xs font-mono text-zinc-500">{p.userType}</td>
+                  
+                  {extraColumns.map(col => (
+                    <td key={col} className="px-6 py-3 text-xs font-mono text-zinc-400">
+                      {p.metadata?.[col] ?? '-'}
+                    </td>
+                  ))}
+
                   <td className="px-6 py-3 text-[10px] font-mono text-zinc-800 text-right tabular-nums">
                     [{p.x.toFixed(2)}, {p.y.toFixed(2)}]
                   </td>

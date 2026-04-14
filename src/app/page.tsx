@@ -8,29 +8,46 @@ import DataVisualizer from '@/components/DataVisualizer';
 import DataTable from '@/components/DataTable';
 import TechSpecs from '@/components/TechSpecs';
 import Glossary from '@/components/Glossary';
-import { generatePopulation, performSampling, calculateMetrics, generateCSV } from '@/lib/math';
+import { generatePopulation, performSampling, calculateMetrics, generateCSV, parseCsv } from '@/lib/math';
 import { DataPoint, SamplingMethod } from '@/lib/types';
 import { Activity } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function Home() {
-  const { language, t } = useLanguage();
+  const { language } = useLanguage();
   
-  // State
   const [population, setPopulation] = useState<DataPoint[]>([]);
   const [method, setMethod] = useState<SamplingMethod>('Simple');
   const [sampleSize, setSampleSize] = useState(100);
   const [strata, setStrata] = useState<'ageGroup' | 'userType'>('userType');
   const [sample, setSample] = useState<DataPoint[]>([]);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [isCustom, setIsCustom] = useState(false);
 
-  // Initialize
   useEffect(() => {
-    setPopulation(generatePopulation(1000));
+    if (!isCustom) {
+      setPopulation(generatePopulation(1000));
+    }
     setIsInitializing(false);
-  }, []);
+  }, [isCustom]);
 
-  // Update sample
+  const handleImport = (text: string) => {
+    const customPop = parseCsv(text);
+    if (customPop.length > 0) {
+      setPopulation(customPop);
+      setIsCustom(true);
+      // Adjust sample size if necessary
+      if (sampleSize > customPop.length) {
+        setSampleSize(Math.min(100, customPop.length));
+      }
+    }
+  };
+
+  const handleReset = () => {
+    setIsCustom(false);
+    setPopulation(generatePopulation(1000));
+  };
+
   useEffect(() => {
     if (population.length === 0) return;
     setSample(performSampling(population, method, sampleSize, { strata }));
@@ -74,16 +91,18 @@ export default function Home() {
           setSampleSize={setSampleSize}
           strata={strata}
           setStrata={setStrata}
+          onImport={handleImport}
+          onReset={handleReset}
+          isCustom={isCustom}
+          maxPoints={population.length}
         />
       }
     >
-      <div className="space-y-8">
-        {/* Metric Cards Grid */}
+      <div className="space-y-8 overflow-hidden">
         <section>
           <MetricCards metrics={metrics} />
         </section>
 
-        {/* Visualization Stage */}
         <section className="space-y-4">
           <div className="flex items-center gap-2 px-1">
             <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{language === 'am' ? 'የእይታ መድረክ' : 'Visualization Stage'}</h2>
@@ -92,7 +111,6 @@ export default function Home() {
           <DataVisualizer population={population} sample={sample} />
         </section>
 
-        {/* Secondary Details Grid */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-8">
             <DataTable sample={sample} />

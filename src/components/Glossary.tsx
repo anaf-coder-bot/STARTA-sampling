@@ -17,7 +17,7 @@ export default function Glossary() {
       </div>
       
       <div className="divide-y divide-zinc-800">
-        {items.map((item: any, i: number) => (
+        {items.map((item: { title: string; content: string; formula: string }, i: number) => (
           <div key={i} className="bg-zinc-950">
             <button
               onClick={() => setOpenIndex(openIndex === i ? null : i)}
